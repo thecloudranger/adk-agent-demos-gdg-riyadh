@@ -12,4 +12,5 @@ COPY agents ./agents
 ENV GOOGLE_GENAI_USE_VERTEXAI=TRUE
 
 # Cloud Run provides $PORT (8080). adk web serves the chat UI + trace panel.
-CMD ["sh", "-c", "adk web agents --host 0.0.0.0 --port ${PORT:-8080}"]
+# --allow_origins '*' lets a custom web app (the "skin") call the REST/WS API.
+CMD ["sh", "-c", "adk web agents --host 0.0.0.0 --port ${PORT:-8080} --allow_origins '*'"]

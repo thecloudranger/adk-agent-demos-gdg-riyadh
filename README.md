@@ -77,22 +77,44 @@ macOS TLS gotcha: if the mic session fails to connect, run
 
 ---
 
-## Deployed (live URL)
+## Deployed — two services, two modalities
 
-Both agents are deployed to Cloud Run (typed surface, `gemini-3.5-flash`):
+A Live native-audio model is **audio-only** (rejects typed calls) and lives in a
+region; the newest text model is **global-only**. So typed and voice are two
+Cloud Run services. Pick the right URL for the modality:
 
-```
-https://gdg-agent-demos-YOUR_PROJECT_NUMBER.us-central1.run.app
-```
+| Service | Model / location | Use | Not |
+|---------|------------------|-----|-----|
+| `gdg-agent-demos` | gemini-3.5-flash · global | **Type** (demo1 + demo2 typed) | mic won't work |
+| `gdg-voice-concierge` | gemini-live-2.5-flash-native-audio · us-central1 | **Mic 📞 only** (demo2 voice) | typing errors |
 
-Redeploy from scratch:
+> Typing into the voice service returns
+> *"gemini-live-2.5-flash-native-audio is not supported in the generateContent API"* —
+> that's expected. Use the mic there.
+
+Deploy both:
 
 ```bash
-./deploy/deploy.sh          # gcloud run deploy --source . (Dockerfile)
+./deploy/deploy.sh                              # typed service (global / 3.5-flash)
+./deploy/deploy.sh --voice                      # voice service (us-central1 / native-audio)
 ```
 
-Voice is **not** deployed — the Live API isn't on the `global` endpoint the
-service uses. Voice is the local wow moment.
+## Web app skin (`webapp/`) — "skin on top, then pop the hood"
+
+A branded single-page chat over the same agent API — good for showing a product
+UI, then opening the ADK dev view (Events / multi-agent topology / traces) as the
+"under the hood". Self-contained HTML, no build.
+
+```bash
+python3 -m http.server 3000 --directory webapp
+# open http://localhost:3000
+#  1. paste your typed-service URL in "Agent API" → Connect
+#  2. pick demo2_concierge → click a sample → watch the → flight_agent / → hotel_agent chips
+#  3. click "Pop the hood → ADK view" to show the raw ADK UI (topology + traces)
+```
+
+The skin talks to the **typed** service (needs CORS — services deploy with
+`--allow_origins '*'`). Voice stays the mic in the ADK UI on the voice service.
 
 ---
 
