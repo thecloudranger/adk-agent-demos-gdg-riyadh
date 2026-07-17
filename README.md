@@ -12,6 +12,12 @@ no BigQuery — reproducible on any laptop.
 > The talk **showcases** these — it does not build them live (that's the follow-up
 > session). This repo is the pre-built, tested artifact.
 
+## Architecture
+
+![Architecture](docs/architecture.drawio.png)
+
+Editable source: [`docs/architecture.drawio`](docs/architecture.drawio) (also `.svg` / `.pdf`).
+
 ---
 
 ## Verified facts (project `YOUR_PROJECT_ID`, 2026-07-17)
