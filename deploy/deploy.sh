@@ -3,6 +3,7 @@
 # Reproducible: run from repo root.
 #   ./deploy/deploy.sh            typed service  (global / gemini-3.5-flash)
 #   ./deploy/deploy.sh --voice    voice service  (us-central1 / native-audio Live)
+#   ./deploy/deploy.sh --skin     the web app skin (static, from webapp/)
 #
 # A Live native-audio model is audio-only and region-bound; the newest text model
 # is global-only. So typed and voice are two separate services (two URLs).
@@ -10,7 +11,18 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 
 PROJECT="${GOOGLE_CLOUD_PROJECT:-YOUR_PROJECT_ID}"
-REGION="${CLOUD_RUN_REGION:-us-central1}"   # Cloud Run service region (both cases)
+REGION="${CLOUD_RUN_REGION:-us-central1}"   # Cloud Run service region
+
+if [[ "${1:-}" == "--skin" ]]; then
+  SERVICE="${SERVICE_NAME:-gdg-agent-skin}"
+  echo "Deploying $SERVICE (web app skin) to Cloud Run ($REGION) in $PROJECT ..."
+  gcloud run deploy "$SERVICE" \
+    --source webapp \
+    --project "$PROJECT" --region "$REGION" \
+    --allow-unauthenticated --memory 512Mi
+  gcloud run services describe "$SERVICE" --project "$PROJECT" --region "$REGION" --format='value(status.url)'
+  exit 0
+fi
 
 if [[ "${1:-}" == "--voice" ]]; then
   SERVICE="${SERVICE_NAME:-gdg-voice-concierge}"
