@@ -119,6 +119,12 @@ const SAMPLES = {
 
 state.api  = localStorage.getItem("adk_api")  || "";
 state.vapi = localStorage.getItem("adk_vapi") || "";
+// URL params win, so a bookmark can preload + auto-connect (no typing on stage):
+//   ?api=<typed-url>&vapi=<voice-url>&agent=demo2_concierge
+const qs = new URLSearchParams(location.search);
+if(qs.get("api"))   state.api  = qs.get("api");
+if(qs.get("vapi"))  state.vapi = qs.get("vapi");
+if(qs.get("agent")) state.agent = qs.get("agent");
 $("#api").value = state.api; $("#vapi").value = state.vapi; $("#agent").value = state.agent;
 updateHood(); renderSamples();
 
