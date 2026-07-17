@@ -101,20 +101,33 @@ Deploy both:
 
 ## Web app skin (`webapp/`) — "skin on top, then pop the hood"
 
-A branded single-page chat over the same agent API — good for showing a product
-UI, then opening the ADK dev view (Events / multi-agent topology / traces) as the
-"under the hood". Self-contained HTML, no build.
+A branded single-page chat over the agent APIs — show a product UI, then open the
+ADK dev view (Events / multi-agent topology / traces) as the "under the hood".
+Self-contained HTML, no build. Does **both** typed and voice:
+
+- **Typed** → the text service (`/run` REST).
+- **📞 Voice** → the voice service (`/run_live` WebSocket): mic → PCM16 → ws,
+  native audio streamed back and played, with **live captions** (from
+  `outputTranscription`) and sub-agent tool chips.
+
+Run locally:
 
 ```bash
-python3 -m http.server 3000 --directory webapp
-# open http://localhost:3000
-#  1. paste your typed-service URL in "Agent API" → Connect
-#  2. pick demo2_concierge → click a sample → watch the → flight_agent / → hotel_agent chips
-#  3. click "Pop the hood → ADK view" to show the raw ADK UI (topology + traces)
+python3 -m http.server 3000 --directory webapp   # open http://localhost:3000
+#  1. "Agent API" = typed service URL, "Voice API" = voice service URL → Connect
+#  2. demo2_concierge → type OR press the green 📞 and talk
+#  3. watch → flight_agent / → hotel_agent chips; "Pop the hood → ADK view" for traces
 ```
 
-The skin talks to the **typed** service (needs CORS — services deploy with
-`--allow_origins '*'`). Voice stays the mic in the ADK UI on the voice service.
+Or host it on Cloud Run:
+
+```bash
+./deploy/deploy.sh --skin        # static container, returns a public URL
+```
+
+CORS: the agent services deploy with `--allow_origins '*'` so the skin (any
+origin) can call REST + WebSocket. Audio in is 16 kHz PCM16; audio back is
+base64url PCM — the skin normalizes it before decoding.
 
 ---
 
