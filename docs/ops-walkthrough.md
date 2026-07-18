@@ -20,8 +20,17 @@ Console → **Agent Platform** (Vertex AI). Left nav mirrors the deck's four pil
 | **Scale** | Agents → **Deployments** | The `gdg-concierge-ops` row on Agent Runtime — "this is the managed runtime, not a VM we manage." |
 | Scale | **Sessions** | Per-user conversation state — short-term memory, no custom DB. |
 | Scale | **Memory Bank** | Long-term memory store (empty unless enabled) — mention as the persistence layer. |
-| **Optimize** | Deployment → **Observability / Traces** | Open a trace → the **multi-agent topology graph**: `concierge → flight_agent → search_flights`. This is the money shot — the deck's "Agent observability" slide, live. |
+| **Optimize** | Deployment → **Traces** (Session view) | Per-session ops table: avg duration, agent invocations, **model calls, tool calls, token usage**. Then click a session → **Graph** → the multi-agent DAG: `invoke_agent concierge → call_llm → execute_tool flight_agent → invoke_agent flight_agent → execute_tool search_flights`. Toggle **Timeline** for the waterfall. The deck's "Agent observability" slide, live. |
+| Optimize | **Topology** tab | The whole multi-agent graph in one view. |
 | Optimize | **Evaluation** | Run/inspect evals — multi-turn autoraters. |
+| — | **Playground** tab | Run the agent live *inside the console* (no local tools). |
+
+> Traces land in the **Agent Platform trace store** (this Traces tab), NOT the
+> classic Cloud Trace `traces.list` API — don't go looking there.
+>
+> Before the talk, click **"Enable prompt-response logging"** on the Traces tab.
+> By default spans capture only a skeleton; enabling it shows the actual prompts +
+> tool-call params inside each span — much better for a walkthrough.
 | **Govern** | **Agent Registry** | Register the agent → central catalog of agents/MCP servers/endpoints. |
 | Govern | **Agent Identity** | The auto-assigned **SPIFFE** identity for the deployed agent (deck's "Agent Identity" slide). |
 | Govern | **Policies / Gateways / Security** | Model Armor, tool-use policies — show the pages even if unconfigured. |
